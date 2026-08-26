@@ -1,0 +1,53 @@
+<div class="page-container container">
+  <h2 class="mb-4">Manage Users</h2>
+
+  @if (loading()) {
+    <app-loading message="Loading users..."></app-loading>
+  } @else if (users().length === 0) {
+    <app-empty-state icon="bi-people" title="No users found"></app-empty-state>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle bg-white shadow-sm">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user._id) {
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.phone || '-' }}</td>
+              <td style="width: 160px;">
+                <select
+                  class="form-select form-select-sm"
+                  [ngModel]="user.role"
+                  [disabled]="updatingId() === user._id || user._id === auth.currentUser()?._id"
+                  (ngModelChange)="changeRole(user, $event)"
+                >
+                  <option value="Customer">Customer</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </td>
+              <td class="text-end">
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  [disabled]="user._id === auth.currentUser()?._id"
+                  (click)="deleteUser(user)"
+                >
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-pagination>
+  }
+</div>
