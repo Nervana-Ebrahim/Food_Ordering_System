@@ -1,0 +1,42 @@
+<div class="page-container container">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="mb-0">My Orders</h2>
+    <select class="form-select" style="width: 200px;" [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+      <option value="">All statuses</option>
+      @for (status of statuses; track status) {
+        <option [value]="status">{{ status }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <app-loading message="Loading your orders..."></app-loading>
+  } @else if (orders().length === 0) {
+    <app-empty-state
+      icon="bi-receipt"
+      title="No orders yet"
+      message="Your placed orders will show up here."
+    ></app-empty-state>
+  } @else {
+    <div class="list-group">
+      @for (order of orders(); track order._id) {
+        <a
+          [routerLink]="['/orders', order._id]"
+          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center flex-wrap gap-2 py-3"
+        >
+          <div>
+            <div class="fw-semibold">Order #{{ order._id.slice(-6).toUpperCase() }}</div>
+            <div class="text-secondary small">{{ order.createdAt | date: 'medium' }}</div>
+          </div>
+          <div class="text-secondary small">{{ order.items.length }} item(s)</div>
+          <div class="fw-bold text-brand">{{ order.totalPrice | number: '1.2-2' }} EGP</div>
+          <span class="badge status-badge" [ngClass]="order.status | statusBadgeClass">{{ order.status }}</span>
+          @if (canCancel(order)) {
+            <button class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order, $event)">Cancel</button>
+          }
+        </a>
+      }
+    </div>
+    <app-pagination [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-pagination>
+  }
+</div>

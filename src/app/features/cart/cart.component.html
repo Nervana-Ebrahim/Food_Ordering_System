@@ -1,0 +1,81 @@
+<div class="page-container container">
+  <h2 class="mb-4">My Cart</h2>
+
+  @if (loading()) {
+    <app-loading message="Loading your cart..."></app-loading>
+  } @else if (cartService.cart().items.length === 0) {
+    <app-empty-state
+      icon="bi-cart-x"
+      title="Your cart is empty"
+      message="Browse the menu and add something delicious."
+    ></app-empty-state>
+    <div class="text-center">
+      <a routerLink="/foods" class="btn btn-brand">Browse Menu</a>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <ul class="list-group list-group-flush">
+            @for (item of cartService.cart().items; track foodId(item.food)) {
+              <li class="list-group-item d-flex align-items-center gap-3 py-3">
+                <img
+                  [src]="foodImage(item.food)"
+                  class="rounded"
+                  style="width: 72px; height: 72px; object-fit: cover;"
+                  [alt]="foodName(item.food)"
+                />
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ foodName(item.food) }}</h6>
+                  <span class="text-secondary small">{{ item.price | number: '1.2-2' }} EGP each</span>
+                </div>
+                <div class="input-group" style="width: 120px;">
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    [disabled]="updatingId() === foodId(item.food)"
+                    (click)="decrease(foodId(item.food), item.quantity)"
+                  >
+                    -
+                  </button>
+                  <input type="text" class="form-control form-control-sm text-center" [value]="item.quantity" readonly />
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    [disabled]="updatingId() === foodId(item.food)"
+                    (click)="increase(foodId(item.food), item.quantity)"
+                  >
+                    +
+                  </button>
+                </div>
+                <div class="fw-semibold text-brand" style="width: 90px; text-align: right;">
+                  {{ item.price * item.quantity | number: '1.2-2' }} EGP
+                </div>
+                <button
+                  class="btn btn-link text-danger"
+                  [disabled]="updatingId() === foodId(item.food)"
+                  (click)="remove(foodId(item.food))"
+                  title="Remove"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+        <button class="btn btn-outline-danger mt-3" (click)="clearCart()">Clear Cart</button>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Order Summary</h5>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Total</span>
+              <span class="fw-bold text-brand fs-5">{{ cartService.cart().totalPrice | number: '1.2-2' }} EGP</span>
+            </div>
+            <a routerLink="/checkout" class="btn btn-brand w-100 mt-3">Proceed to Checkout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

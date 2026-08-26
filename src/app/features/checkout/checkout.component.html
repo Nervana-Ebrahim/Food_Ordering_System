@@ -1,0 +1,84 @@
+<div class="page-container container" style="max-width: 700px;">
+  <h2 class="mb-4">Checkout</h2>
+
+  @if (loadingCart()) {
+    <p class="text-secondary">Loading your cart...</p>
+  } @else if (cartService.cart().items.length === 0) {
+    <app-empty-state
+      icon="bi-cart-x"
+      title="Your cart is empty"
+      message="Add items to your cart before checking out."
+    ></app-empty-state>
+    <div class="text-center">
+      <a routerLink="/foods" class="btn btn-brand">Browse Menu</a>
+    </div>
+  } @else {
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Order Summary</h5>
+        <ul class="list-group list-group-flush mb-3">
+          @for (item of cartService.cart().items; track $index) {
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span>Qty {{ item.quantity }}</span>
+              <span>{{ item.price * item.quantity | number: '1.2-2' }} EGP</span>
+            </li>
+          }
+        </ul>
+        <div class="d-flex justify-content-between fw-bold fs-5">
+          <span>Total</span>
+          <span class="text-brand">{{ cartService.cart().totalPrice | number: '1.2-2' }} EGP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Delivery Address</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              formControlName="address"
+              [class.is-invalid]="f.address.invalid && f.address.touched"
+            ></textarea>
+            @if (f.address.invalid && f.address.touched) {
+              <div class="invalid-feedback">Delivery address is required.</div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label d-block">Payment Method</label>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="cash"
+                value="Cash"
+                formControlName="paymentMethod"
+              />
+              <label class="form-check-label" for="cash">Cash</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="card"
+                value="Card"
+                formControlName="paymentMethod"
+              />
+              <label class="form-check-label" for="card">Card</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-brand w-100 btn-lg" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            Place Order
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+</div>
