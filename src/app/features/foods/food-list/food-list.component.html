@@ -1,0 +1,70 @@
+<div class="page-container container">
+  <h2 class="mb-4">Our Menu</h2>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small">Search</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Food name..."
+            [(ngModel)]="filters.search"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Category</label>
+          <select class="form-select" [(ngModel)]="filters.category">
+            <option value="">All categories</option>
+            @for (category of categories(); track category._id) {
+              <option [value]="category._id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Min Price</label>
+          <input type="number" min="0" class="form-control" [(ngModel)]="filters.minPrice" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Max Price</label>
+          <input type="number" min="0" class="form-control" [(ngModel)]="filters.maxPrice" />
+        </div>
+        <div class="col-md-2 form-check ms-2">
+          <input type="checkbox" class="form-check-input" id="availableOnly" [(ngModel)]="filters.available" />
+          <label class="form-check-label small" for="availableOnly">Available only</label>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-brand" (click)="applyFilters()">Apply Filters</button>
+        <button class="btn btn-outline-secondary" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading message="Loading foods..."></app-loading>
+  } @else if (error()) {
+    <app-empty-state
+      icon="bi-exclamation-triangle"
+      title="Something went wrong"
+      message="We couldn't load the menu. Please try again."
+    ></app-empty-state>
+  } @else if (foods().length === 0) {
+    <app-empty-state
+      icon="bi-search"
+      title="No foods found"
+      message="Try adjusting your search or filters."
+    ></app-empty-state>
+  } @else {
+    <div class="row g-4">
+      @for (food of foods(); track food._id) {
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <app-food-card [food]="food" (addToCart)="addToCart($event)"></app-food-card>
+        </div>
+      }
+    </div>
+    <app-pagination [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-pagination>
+  }
+</div>

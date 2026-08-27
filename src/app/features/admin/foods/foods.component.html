@@ -1,0 +1,94 @@
+<div class="page-container container">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="mb-0">Manage Foods</h2>
+    <a routerLink="/admin/foods/create" class="btn btn-brand">
+      <i class="bi bi-plus-lg me-1"></i>New Food
+    </a>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-2">
+        <div class="col-md-5">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search by name..."
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="col-md-4">
+          <select class="form-select" [(ngModel)]="categoryFilter">
+            <option value="">All categories</option>
+            @for (category of categories(); track category._id) {
+              <option [value]="category._id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-brand w-100" (click)="applyFilters()">Search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading message="Loading foods..."></app-loading>
+  } @else if (foods().length === 0) {
+    <app-empty-state icon="bi-egg-fried" title="No foods found"></app-empty-state>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle bg-white shadow-sm">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Available</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (food of foods(); track food._id) {
+            <tr>
+              <td>
+                <img
+                  [src]="food.image || 'https://placehold.co/60x60?text=Food'"
+                  style="width: 48px; height: 48px; object-fit: cover;"
+                  class="rounded"
+                  [alt]="food.name"
+                />
+              </td>
+              <td>{{ food.name }}</td>
+              <td>{{ categoryName(food) || '-' }}</td>
+              <td>{{ food.price | number: '1.2-2' }} EGP</td>
+              <td>
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    [checked]="food.available"
+                    [disabled]="updatingId() === food._id"
+                    (change)="toggleAvailability(food)"
+                  />
+                </div>
+              </td>
+              <td class="text-end">
+                <a [routerLink]="['/admin/foods', food._id, 'edit']" class="btn btn-outline-secondary btn-sm me-2">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteFood(food)">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-pagination>
+  }
+</div>
