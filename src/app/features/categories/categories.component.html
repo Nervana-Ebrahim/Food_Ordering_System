@@ -1,0 +1,31 @@
+<div class="page-container container">
+  <h2 class="mb-4">Categories</h2>
+
+  @if (loading()) {
+    <app-loading message="Loading categories..."></app-loading>
+  } @else if (categories().length === 0) {
+    <app-empty-state icon="bi-tags" title="No categories yet"></app-empty-state>
+  } @else {
+    <div class="row g-4">
+      @for (category of categories(); track category._id) {
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <a
+            [routerLink]="['/foods']"
+            [queryParams]="{ category: category._id }"
+            class="card h-100 text-decoration-none text-dark card-hover shadow-sm"
+          >
+            <img
+              [src]="category.image || 'https://placehold.co/300x200?text=' + category.name"
+              class="card-img-top"
+              style="height: 160px; object-fit: cover;"
+              [alt]="category.name"
+            />
+            <div class="card-body text-center">
+              <h5 class="mb-0">{{ category.name }}</h5>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>

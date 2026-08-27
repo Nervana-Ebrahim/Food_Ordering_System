@@ -1,0 +1,84 @@
+<div class="page-container container" style="max-width: 650px;">
+  <h2 class="mb-4">{{ isEditMode ? 'Edit' : 'Create' }} Food</h2>
+
+  @if (loading()) {
+    <app-loading message="Loading food..."></app-loading>
+  } @else {
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="f.name.invalid && f.name.touched"
+            />
+            @if (f.name.invalid && f.name.touched) {
+              <div class="invalid-feedback">Name must be 2-150 characters.</div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" formControlName="description"></textarea>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Price</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="form-control"
+                formControlName="price"
+                [class.is-invalid]="f.price.invalid && f.price.touched"
+              />
+              @if (f.price.invalid && f.price.touched) {
+                <div class="invalid-feedback">Price must be 0 or greater.</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Category</label>
+              <select
+                class="form-select"
+                formControlName="category"
+                [class.is-invalid]="f.category.invalid && f.category.touched"
+              >
+                <option value="" disabled>Select a category</option>
+                @for (category of categories(); track category._id) {
+                  <option [value]="category._id">{{ category.name }}</option>
+                }
+              </select>
+              @if (f.category.invalid && f.category.touched) {
+                <div class="invalid-feedback">Category is required.</div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Image URL</label>
+            <input type="text" class="form-control" formControlName="image" placeholder="https://..." />
+          </div>
+
+          <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" role="switch" id="available" formControlName="available" />
+            <label class="form-check-label" for="available">Available for ordering</label>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-brand flex-fill" [disabled]="saving()">
+              @if (saving()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              }
+              {{ isEditMode ? 'Save Changes' : 'Create Food' }}
+            </button>
+            <a routerLink="/admin/foods" class="btn btn-outline-secondary flex-fill">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
